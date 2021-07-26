@@ -1,0 +1,31 @@
+{
+  "name": "crmgraphqlcurso",
+  "version": "1.0.0",
+  "description": "Curso para fullstack en JS",
+  "main": "index.js",
+  "scripts": {
+    "start": "node .",
+    "dev": "nodemon ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DiegoCampaneroNegrete/CRMGraphql.git"
+  },
+  "author": "Diego Campanero",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DiegoCampaneroNegrete/CRMGraphql/issues"
+  },
+  "homepage": "https://github.com/DiegoCampaneroNegrete/CRMGraphql#readme",
+  "dependencies": {
+    "apollo-server": "^3.0.1",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^10.0.0",
+    "graphql": "^15.5.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.13.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  }
+}

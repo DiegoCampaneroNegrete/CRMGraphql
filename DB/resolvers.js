@@ -1,4 +1,5 @@
 const Usuario = require('../models/Usuarios');
+const Producto = require('../models/Productos');
 const bcryptjs = require('bcryptjs');
 require('dotenv').config({path: 'variables.env'});
 const jwt = require('jsonwebtoken');
@@ -26,6 +27,7 @@ const resolvers = {
         }
     },
     Mutation: {
+        //  USUSARIOS
         createUser: async (_, {input}) => {
             const {email, password} = input;
             const userExist = await Usuario.findOne({email});
@@ -63,8 +65,11 @@ const resolvers = {
             }
 
             return { token: createToken(userExist, process.env.SECRET_WORD, '24h') };
-        }
+        },
+        // PRODUCTOS
+        createProduct: async (_, {input}) => {
 
+        },
     }
 };
 

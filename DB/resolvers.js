@@ -1,5 +1,6 @@
 const Usuario = require('../models/Usuarios');
 const Producto = require('../models/Productos');
+const Cliente = require('../models/Cliente');
 const bcryptjs = require('bcryptjs');
 require('dotenv').config({path: 'variables.env'});
 const jwt = require('jsonwebtoken');
@@ -42,6 +43,38 @@ const resolvers = {
             }
 
             return product
+        },
+        getClients: async () => {
+            try {
+                const clientes = await Cliente.find({});
+                return clientes     
+            } catch (error) {
+                console.log('Error Query getClients', error);
+            }
+        },
+        getClientByVendor: async (_, {}, ctx) => {
+            try {
+                const id = ctx.user.id;
+                console.log('getClientByVendor Id', id);
+                const clientes = await Cliente.find({vendedor: id});
+                return clientes     
+            } catch (error) {
+                console.log('Error Query getClientByVendor', error);
+            }
+        },
+        getClient: async (_, {id}, ctx) => {
+            // Verificar si existe el cliente
+            const client = await Cliente.findById(id);
+            if (!client) {
+                throw new Error('Cliente no encontrado');
+            }
+
+            // Quien lo Creo puede verlo
+            if (client.vendedor.toString() !== ctx.user.id) {
+                throw new Error('No cuentas con las credenciales del cliente')
+            }
+
+            return client;
         }
     },
     Mutation: {
@@ -118,6 +151,70 @@ const resolvers = {
             // Eliminar Producto
             await Producto.findOneAndDelete({_id: id});
             return 'Producto Eliminado';
+        },
+        // Cliente:
+        createCliente: async (_, {input}, ctx) => {
+            console.log('Context', ctx);
+            // return null;
+            const {email} = input;
+            // Verificando si el cliente esta asignado:
+            const cliente = await Cliente.findOne({email});
+
+            if (cliente) {
+                throw new Error('Cliente ya creado con correo');
+            }
+            // Creando Instancia
+            const newClient = new Cliente(input);
+            newClient.vendedor = ctx.user.id;
+            // Asignar el vendedor
+
+            // Guardarlo en la BD
+            try {
+                
+                // console.log('newClient ***', newClient);
+
+                const response = await newClient.save()
+                return response;    
+            } catch (error) {
+                console.log('CreateClient() => Error =>', error);
+            }
+        },
+        updateCliente: async (_, {id, input}, ctx) => {
+            // Verificar si existe el cliente
+            const client = await Cliente.findById(id);
+            
+            if (!client) {
+                throw new Error('Cliente no existe');
+            }            
+
+            // Verificar si edita el usuario
+            
+            if (client.vendedor.toString() !== ctx.user.id) {
+                throw new Error('No cuentas con las credenciales del cliente')
+            }
+
+            // Guardar cambiso de cliente
+            const response = await Cliente.findOneAndUpdate({_id: id}, input, {new: true});
+            return response;
+        },
+        deleteCliente: async (_, {id}, ctx) => {
+            // Verificar si existe el cliente
+            const client = await Cliente.findById(id);
+            
+            if (!client) {
+                throw new Error('Cliente no existe');
+            }            
+
+            // Verificar si edita el usuario
+            
+            if (client.vendedor.toString() !== ctx.user.id) {
+                throw new Error('No cuentas con las credenciales del cliente')
+            }
+
+            // Guardar cambiso de cliente
+            const response = await Cliente.findOneAndDelete({_id: id});
+            return "Cliente Eliminado";
+
         }
     }
 };
